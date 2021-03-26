@@ -14,6 +14,11 @@ EMAIL_PASSWORD = None
 EMAIL_SMTP_SERVER = None
 EMAIL_SMTP_POST = None
 
+
+LOGIN_MAIL = "info@travelandabroad.com"
+LOGIN_PASSWORD = "Gonzalo01!"
+
+
 """Incoming email settings"""
 EMAIL_IMAP_SERVER = None
 EMAIL_IMAP_PORT = None
