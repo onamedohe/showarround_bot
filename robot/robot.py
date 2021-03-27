@@ -1,5 +1,6 @@
 import time
-
+import random
+import pandas as pd
 from iBott.robot_activities import Robot, RobotException, Robotmethod, get_all_Methods, get_instances
 from iBott.browser_activities import ChromeBrowser
 import robot.settings as settings
@@ -33,6 +34,7 @@ class Main(Robot):
 
         self.browser = ChromeBrowser()
         self.browser.open()
+        self.browser.maximize_window()
 
 
 
@@ -65,42 +67,54 @@ class Main(Robot):
 
             self.browser.find_element_by_xpath("/html/body/div[3]/div/div[2]/button[2]").click()
 
-            self.browser.get("https://www.showaround.com/settings")
-            time.sleep(3)
-            location = self.browser.find_element_by_xpath("//*[@id='location']/a")
-            location.click()
-            time.sleep(1)
-            location_box = self.browser.find_element_by_xpath("//*[@id='location']/div/form/input")
-            location_box.click()
-            time.sleep(1)
-            location_box.clear()
-            location_box.send_keys("Barcelona, Spain")
-            time.sleep(1)
-            first_location_result = self.browser.find_element_by_xpath("/html/body/ul[2]/li[1]")
-            first_location_result.click()
-            time.sleep(1)
-            save_button = self.browser.find_element_by_xpath("//*[@id='location']/div/form/div[2]/button")
-            save_button.click()
-            time.sleep(1)
+            city_list = pd.read_excel("city_list.xlsx", header=0)
+            city_list = city_list['Cities'].tolist()
+            city_list = random.sample(city_list, len(city_list))
 
-            send_offers_button = self.browser.find_element_by_xpath("/html/body/div[1]/header/sa-navigation/div/div[2]/div/div[2]/a")
-            send_offers_button.click()
-            time.sleep(2)
+            for city in city_list:
+                self.browser.get("https://www.showaround.com/settings")
+                time.sleep(3)
+                location = self.browser.find_element_by_xpath("//*[@id='location']/a")
+                location.click()
+                time.sleep(1)
+                location_box = self.browser.find_element_by_xpath("//*[@id='location']/div/form/input")
+                location_box.click()
+                location_box.clear()
+                location_box.send_keys(city)
+                time.sleep(1)
+                if self.browser.element_exists('xpath', "/html/body/ul[2]/li[1]"):
+                    first_location_result = self.browser.find_element_by_xpath("/html/body/ul[2]/li[1]")
+                    first_location_result.click()
+                    time.sleep(1)
+                    save_button = self.browser.find_element_by_xpath("//*[@id='location']/div/form/div[2]/button")
+                    save_button.click()
+                    time.sleep(1)
 
-            view_all_offers = self.browser.find_element_by_xpath("/html/body/div[1]/section[1]/div[1]/div/div[2]/div[2]/div/div/sa-conversation-trip/a/div/div[3]/button")
-            view_all_offers.click()
+                    send_offers_button = self.browser.find_element_by_xpath("/html/body/div[1]/header/sa-navigation/div/div[2]/div/div[2]/a")
+                    send_offers_button.click()
 
-
-            send_offers = self.browser.find_elements_by_xpath("//button[contains(text(),'Send Offer')]")
-
-            for offer in send_offers:
-                offer.click()
+                    time.sleep(3)
+                    if self.browser.element_exists("xpath", "//button[contains(text(),'View')]"):
+                        view_all_offers = self.browser.find_element_by_xpath("//button[contains(text(),'View')]")
+                        view_all_offers.click()
+                        time.sleep(3)
+                        send_offers = self.browser.find_elements_by_xpath("//button[contains(text(),'Send Offer')]")
+                        for offer in send_offers:
+                            offer.click()
+                            time.sleep(3)
+                            send_offer = self.browser.find_element_by_xpath("//div[@class='SendOfferModal-footer']//button")
+                            send_offer.click()
+                            time.sleep(1)
+                            if self.browser.element_exists("xpath", "//button[contains(text(),'OK, got it')]"):
+                                ok_got_it = self.browser.find_element_by_xpath("//button[contains(text(),'OK, got it')]")
+                                ok_got_it.click()
 
 
     @Robotmethod
     def end(self):
         """Finish robot execution, cleanup environment, close applications and send reports"""
 
+        self.browser.close()
 
 
 class BusinessException(RobotException):
