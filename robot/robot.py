@@ -1,3 +1,4 @@
+import os
 import time
 import random
 import pandas as pd
@@ -67,8 +68,8 @@ class Main(Robot):
 
             self.browser.find_element_by_xpath("/html/body/div[3]/div/div[2]/button[2]").click()
 
-            city_list = pd.read_excel("city_list.xlsx", header=0)
-            city_list = city_list['Cities'].tolist()
+            city_list = pd.read_excel(os.path.join(settings.ROBOT_FOLDER,"city_list.xlsx"), header=0)
+            city_list = city_list['Citiessettings.'].tolist()
             city_list = random.sample(city_list, len(city_list))
 
             for city in city_list:
