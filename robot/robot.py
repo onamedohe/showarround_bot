@@ -50,7 +50,7 @@ class Main(Robot):
             self.queue.createItem({"city": city})
 
         #Init showaaround classes
-        self.showaround = Showaround(self.browser)
+        self.showaround = Showaround(self.browser, self)
 
 
     @Robotmethod
