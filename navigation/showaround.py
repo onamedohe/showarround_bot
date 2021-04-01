@@ -4,7 +4,6 @@ import robot.settings as settings
 class Showaround:
     def __init__(self, browser):
         self.browser = browser
-        self.city = None
 
     def login(self):
         self.browser.get("https://www.showaround.com/")
@@ -37,7 +36,6 @@ class Showaround:
             self.browser.find_element_by_xpath("/html/body/div[3]/div/div[2]/button[2]").click()
 
     def apply(self, city):
-        self.city = city
         self.browser.get("https://www.showaround.com/settings")
         time.sleep(3)
         location = self.browser.find_element_by_xpath("//*[@id='location']/a")
@@ -46,7 +44,7 @@ class Showaround:
         location_box = self.browser.find_element_by_xpath("//*[@id='location']/div/form/input")
         location_box.click()
         location_box.clear()
-        self.Log.debug(f"Applying to offers in {self.city.value['city']}")
+        self.Log.debug(f"Applying to offers in {city.value['city']}")
         location_box.send_keys(self.city.value['city'])
         time.sleep(1)
         if self.browser.element_exists('xpath', "/html/body/ul[2]/li[1]"):

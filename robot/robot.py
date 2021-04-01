@@ -70,7 +70,8 @@ class Main(Robot):
             try:
                 self.showaround.apply(city)
                 city.setItemAsOk()
-            except:
+            except Exception as e:
+                raise SystemException
                 city.setItemAsFail()
 
     @Robotmethod
