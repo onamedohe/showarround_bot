@@ -315,14 +315,14 @@ class RobotException(Exception):
         self.action = action
         self.methods = cls.methods
 
-    def find_index_method(self):
+    def __find_index_method(self):
         methodsName = []
         for method in self.methods:
             methodsName.append(method.__name__)
         return methodsName.index(self.action)
 
     def retry(self, retry_times):
-        index = self.find_index_method()
+        index = self.__find_index_method()
         if self.count_retry_times() <= retry_times:
             for i in range(index, len(self.methods) - 1):
                 self.methods[i]()
@@ -331,7 +331,7 @@ class RobotException(Exception):
 
     def jump_to_method(self, method, retry_times):
         self.action = method
-        index = self.find_index_method()
+        index = self.__find_index_method()
         if self.count_retry_times() <= retry_times:
             for i in range(index, len(self.methods) - 1):
                 self.methods[i]()

@@ -2,7 +2,7 @@ import os
 import time
 import random
 import pandas as pd
-from iBott.robot_activities import Robot, RobotException, Robotmethod, get_all_Methods, get_instances
+from iBott.robot_activities import Robot, RobotException, Robotmethod, get_all_Methods, get_instances, Queue
 from iBott.browser_activities import ChromeBrowser
 import robot.settings as settings
 
@@ -37,7 +37,16 @@ class Main(Robot):
         self.browser.open()
         self.browser.maximize_window()
 
+        # init QueueId
 
+        city_list = pd.read_excel(os.path.join(settings.ROBOT_FOLDER, "city_list.xlsx"), header=0)
+        city_list = city_list["Cities"].tolist()
+        city_list = random.sample(city_list, len(city_list))
+
+        self.queue = Queue("Showaround Bot")
+
+        for city in city_list:
+            self.queue.createItem({"city": city})
 
     @Robotmethod
     def process(self):
@@ -50,29 +59,33 @@ class Main(Robot):
             other_options_button = self.browser.find_element_by_xpath("//button[contains(text(),'Show other options')]")
             other_options_button.click()
             time.sleep(3)
-            connect_with_mail_button = self.browser.find_element_by_xpath("/html/body/div[5]/div/div/div[2]/div/div/div/div/div/div[3]/div/div[2]/button")
+            connect_with_mail_button = self.browser.find_element_by_xpath(
+                "/html/body/div[5]/div/div/div[2]/div/div/div/div/div/div[3]/div/div[2]/button")
             connect_with_mail_button.click()
             time.sleep(1)
-            existing_user_button = self.browser.find_element_by_xpath("/html/body/div[5]/div/div/div[2]/div/div/div[1]/span[1]")
+            existing_user_button = self.browser.find_element_by_xpath(
+                "/html/body/div[5]/div/div/div[2]/div/div/div[1]/span[1]")
             existing_user_button.click()
-            email_box = self.browser.find_element_by_xpath("/html/body/div[5]/div/div/div[2]/div/div/div[2]/form/input[1]")
+            email_box = self.browser.find_element_by_xpath(
+                "/html/body/div[5]/div/div/div[2]/div/div/div[2]/form/input[1]")
             email_box.click()
             email_box.send_keys(settings.LOGIN_MAIL)
-            password_box = self.browser.find_element_by_xpath("//html/body/div[5]/div/div/div[2]/div/div/div[2]/form/input[2]")
+            password_box = self.browser.find_element_by_xpath(
+                "//html/body/div[5]/div/div/div[2]/div/div/div[2]/form/input[2]")
             password_box.click()
             password_box.send_keys(settings.LOGIN_PASSWORD)
 
-            login_button = self.browser.find_element_by_xpath("/html/body/div[5]/div/div/div[2]/div/div/div[2]/form/div[4]/button")
+            login_button = self.browser.find_element_by_xpath(
+                "/html/body/div[5]/div/div/div[2]/div/div/div[2]/form/div[4]/button")
             login_button.click()
             time.sleep(3)
 
             self.browser.find_element_by_xpath("/html/body/div[3]/div/div[2]/button[2]").click()
 
-            city_list = pd.read_excel(os.path.join(settings.ROBOT_FOLDER, "city_list.xlsx"), header=0)
-            city_list = city_list["Cities"].tolist()
-            city_list = random.sample(city_list, len(city_list))
-
-            for city in city_list:
+            while True:
+                city = self.queue.getNextItem()
+                if city is None:
+                    break
                 self.browser.get("https://www.showaround.com/settings")
                 time.sleep(3)
                 location = self.browser.find_element_by_xpath("//*[@id='location']/a")
@@ -81,7 +94,7 @@ class Main(Robot):
                 location_box = self.browser.find_element_by_xpath("//*[@id='location']/div/form/input")
                 location_box.click()
                 location_box.clear()
-                location_box.send_keys(city)
+                location_box.send_keys(city.value['city'])
                 time.sleep(1)
                 if self.browser.element_exists('xpath', "/html/body/ul[2]/li[1]"):
                     first_location_result = self.browser.find_element_by_xpath("/html/body/ul[2]/li[1]")
@@ -91,7 +104,8 @@ class Main(Robot):
                     save_button.click()
                     time.sleep(1)
 
-                    send_offers_button = self.browser.find_element_by_xpath("/html/body/div[1]/header/sa-navigation/div/div[2]/div/div[2]/a")
+                    send_offers_button = self.browser.find_element_by_xpath(
+                        "/html/body/div[1]/header/sa-navigation/div/div[2]/div/div[2]/a")
                     send_offers_button.click()
 
                     time.sleep(3)
@@ -103,13 +117,13 @@ class Main(Robot):
                         for offer in send_offers:
                             offer.click()
                             time.sleep(3)
-                            send_offer = self.browser.find_element_by_xpath("//div[@class='SendOfferModal-footer']//button")
+                            send_offer = self.browser.find_element_by_xpath(
+                                "//div[@class='SendOfferModal-footer']//button")
                             send_offer.click()
                             time.sleep(1)
                             if self.browser.element_exists("xpath", "//a[contains(text(),'OK, got it')]"):
                                 ok_got_it = self.browser.find_element_by_xpath("//a[contains(text(),'OK, got it')]")
                                 ok_got_it.click()
-
 
     @Robotmethod
     def end(self):
@@ -121,7 +135,7 @@ class Main(Robot):
 class BusinessException(RobotException):
     """Manage Exceptions Caused by business errors"""
 
-    def _init__(self,  message, action):
+    def _init__(self, message, action):
         super().__init__(get_instances(Main), action)
         self.action = action
         self.message = message
