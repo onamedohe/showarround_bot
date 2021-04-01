@@ -3,6 +3,8 @@ from pathlib import Path
 
 ROBOT_FOLDER = Path(os.path.dirname(os.path.realpath(__file__))).parent
 
+RETRY_TIMES = 3
+
 """Folder to store Chrome Driver"""
 CHROMEDRIVER_PATH = os.path.join(ROBOT_FOLDER, "Driver")
 
