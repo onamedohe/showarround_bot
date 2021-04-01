@@ -2,7 +2,7 @@ import time
 import robot.settings as settings
 
 class Showaround:
-    def __init__(self, browser, city):
+    def __init__(self, browser):
         self.browser = browser
         self.city = None
 
