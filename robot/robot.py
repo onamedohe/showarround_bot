@@ -43,7 +43,7 @@ class Main(Robot):
         city_list = city_list["Cities"].tolist()
         city_list = random.sample(city_list, len(city_list))
 
-        self.queue = Queue("Showaround Bot")
+        self.queue = Queue(robotId=self.robotId, url=self.url, token=self.token, queueName="Showaround Bot")
 
         for city in city_list:
             self.queue.createItem({"city": city})
