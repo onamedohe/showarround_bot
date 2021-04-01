@@ -95,8 +95,8 @@ class Main(Robot):
                 location_box.click()
                 location_box.clear()
                 self.Log.debug(city.value)
-                self.Log.debug(city.value[0])
-                location_box.send_keys(city.value[0]['city'])
+                self.Log.debug(city.value['city'])
+                location_box.send_keys(city.value['city'])
                 time.sleep(1)
                 if self.browser.element_exists('xpath', "/html/body/ul[2]/li[1]"):
                     first_location_result = self.browser.find_element_by_xpath("/html/body/ul[2]/li[1]")
