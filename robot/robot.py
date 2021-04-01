@@ -106,8 +106,8 @@ class Main(Robot):
                             send_offer = self.browser.find_element_by_xpath("//div[@class='SendOfferModal-footer']//button")
                             send_offer.click()
                             time.sleep(1)
-                            if self.browser.element_exists("xpath", "//button[contains(text(),'OK, got it')]"):
-                                ok_got_it = self.browser.find_element_by_xpath("//button[contains(text(),'OK, got it')]")
+                            if self.browser.element_exists("xpath", "//a[contains(text(),'OK, got it')]"):
+                                ok_got_it = self.browser.find_element_by_xpath("//a[contains(text(),'OK, got it')]")
                                 ok_got_it.click()
 
 
