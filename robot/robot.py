@@ -109,5 +109,5 @@ class SystemException(RobotException):
     def processException(self):
         """Write action when a system exception occurs"""
 
-        self.reestart(self.retry_times)
+        self.restart(self.retry_times)
         self.Log.systemException(self.message)
