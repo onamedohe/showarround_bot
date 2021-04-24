@@ -71,8 +71,8 @@ class Main(Robot):
                 self.showaround.apply(city)
                 city.setItemAsOk()
             except Exception as e:
-                raise SystemException
                 city.setItemAsFail()
+                raise SystemException("Precess fail", "process")
 
     @Robotmethod
     def end(self):
